@@ -44,7 +44,7 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             result = map_creator.generate_map( None )
-            the_time = datetime.today().strftime(%Y%m%d%H%M%S%f)
+            the_time = int(datetime.today().strftime('%Y%m%d%H%M%S%f'))
             #save_data = { content : os.path.join(app.config['UPLOAD_FOLDER'], filename) , time : the_time }
             return redirect('/uploads/'+filename)
         #redirect(url_for('uploads', filename=filename))
