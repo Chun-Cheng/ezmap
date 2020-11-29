@@ -3,6 +3,7 @@ from flask import Flask, render_template, flash, request, redirect, url_for, sen
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import pymongo
+from bson.objectid import ObjectId
 import dns # required for connecting with SRVt
 import map_creator
 
@@ -52,23 +53,15 @@ def upload_file():
             save_data = { 'content' : result , 'date' : the_date , 'time' : the_time }  # os.path.join(app.config['UPLOAD_FOLDER'], filename)
             data_id = datas.insert_one(save_data)
             return 'OK!'
-            return redirect('/uploads/'+filename)
+            return redirect(f'/result/{data_id}')
         #redirect(url_for('uploads', filename=filename))
     return render_template('index.html')
 
-'''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-'''
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+@app.route('/result/<id>')
+def complete_file(id):
+    thing = datas.find_one({'_id': ObjectId(id) })
+    return thing
 
 
 
