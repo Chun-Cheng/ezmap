@@ -30,8 +30,8 @@ def allowed_file(filename):
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     # 刪除過期資料
-    datas.delete_many( { 'date' : { $lt : int(datetime.today().strftime('%Y%m%d'))-1 } } )
-    datas.delete_many( { 'time' : { $lt : int(datetime.now().strftime('%H%M%S'))-10000 } } )
+    datas.delete_many( { 'date' : { '$lt' : int(datetime.today().strftime('%Y%m%d'))-1 } } )
+    datas.delete_many( { 'time' : { '$lt' : int(datetime.now().strftime('%H%M%S'))-10000 } } )
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
