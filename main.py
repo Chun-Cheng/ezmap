@@ -62,7 +62,7 @@ def upload_file():
 def complete_file(id):
     global datas
     thing = datas.find_one({'id': id })
-    return thing['content']
+    return render_template('result.html', content=thing['content'])
 
 
 
