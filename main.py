@@ -6,7 +6,7 @@ import pymongo
 import dns # required for connecting with SRVt
 import map_creator
 
-UPLOAD_FOLDER = '/files'
+
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'json'}
 
 
@@ -16,7 +16,6 @@ data = client.mapdata.datas
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\xaa2K\xb4\xc6*\x94u#*\x05\xb1\x9ds\x86\xc6\xde\x05\xb8i\two\x0f' #隨機亂碼
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
 
 """
@@ -44,7 +43,9 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            result = map_creator.generate_map( None )
+            the_time = datetime.today().strftime(%Y%m%d%H%M%S%f)
+            #save_data = { content : os.path.join(app.config['UPLOAD_FOLDER'], filename) , time : the_time }
             return redirect('/uploads/'+filename)
         #redirect(url_for('uploads', filename=filename))
     return render_template('index.html')
