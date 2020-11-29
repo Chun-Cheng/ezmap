@@ -1,5 +1,10 @@
 ## 拓樸地圖產生器 使用說明
 
+您可以在 https://ezmap.herokuapp.com 製作屬於您的拓樸地圖
+
+依照下方描述的格式製作json格式的檔案，上傳送出後即可得到拓樸地圖。
+你可以直接分享該網址，但是它將於一小時後被刪除。
+
 You can use the [editor on GitHub](https://github.com/Chun-Cheng/ezmap/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
@@ -35,5 +40,6 @@ Your Pages site will use the layout and styles from the Jekyll theme you have se
 ### Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+
 
 Powered by **GitHub Pages**
