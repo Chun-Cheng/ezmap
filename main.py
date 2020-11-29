@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, flash, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
-import datetime
+from datetime import datetime
 import pymongo
 import dns # required for connecting with SRVt
 import map_creator
