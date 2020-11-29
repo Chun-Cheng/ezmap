@@ -1,10 +1,18 @@
 import os
 from flask import Flask, render_template, flash, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
-import map_creator.generate_map
+import datetime
+import pymongo
+import dns # required for connecting with SRVt
+import map_creator
 
 UPLOAD_FOLDER = '/files'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'json'}
+
+
+client = pymongo.MongoClient("mongodb+srv://dbUser:K3aCVDqGjoP9v5U8@themap.74csp.mongodb.net/mapdata?retryWrites=true&w=majority")
+data = client.mapdata.datas
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\xaa2K\xb4\xc6*\x94u#*\x05\xb1\x9ds\x86\xc6\xde\x05\xb8i\two\x0f' #隨機亂碼
