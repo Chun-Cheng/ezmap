@@ -260,7 +260,7 @@ def generate_map(data):
     """
     
     document_HTML = f"""
-    <canvas id="canva" width="800" height="800" onload="draw();">
+    <canvas id="canva" width="800" height="800" class="content" onload="draw();">
     </canvas>
     
     <script>
