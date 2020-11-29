@@ -42,10 +42,10 @@ def upload_file():
             flash('未選擇任何檔案')
             return redirect(request.url)
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+            #filename = secure_filename(file.filename)
             result = map_creator.generate_map( None )
             the_time = int(datetime.today().strftime('%Y%m%d%H%M%S%f'))
-            save_data = { 'content' : file , 'time' : the_time }  # os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            save_data = { 'content' : file.read() , 'time' : the_time }  # os.path.join(app.config['UPLOAD_FOLDER'], filename)
             data_id = datas.insert_one(save_data)
             return 'OK!'
             return redirect('/uploads/'+filename)
