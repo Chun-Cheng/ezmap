@@ -45,10 +45,11 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             #filename = secure_filename(file.filename)
-            result = map_creator.generate_map( None )
+            content = file.read().decode('utf-8')
+            result = map_creator.generate_map(content)
             the_date = int(datetime.today().strftime('%Y%m%d'))
             the_time = int(datetime.now().strftime('%H%M%S'))
-            save_data = { 'content' : file.read() , 'date' : the_date , 'time' : the_time }  # os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            save_data = { 'content' : result , 'date' : the_date , 'time' : the_time }  # os.path.join(app.config['UPLOAD_FOLDER'], filename)
             data_id = datas.insert_one(save_data)
             return 'OK!'
             return redirect('/uploads/'+filename)
