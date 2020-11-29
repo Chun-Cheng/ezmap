@@ -47,7 +47,7 @@ def upload_file():
         if file and allowed_file(file.filename):
             #filename = secure_filename(file.filename)
             content = file.read().decode('utf-8')
-            result = map_creator.generate_map(content)
+            result = list(map_creator.generate_map(content))
             the_date = int(datetime.today().strftime('%Y%m%d'))
             the_time = int(datetime.now().strftime('%H%M%S'))
             data_id = str(datetime.now().strftime('%Y%m%d%H%M%S%f'))
@@ -62,7 +62,7 @@ def upload_file():
 def complete_file(id):
     global datas
     thing = datas.find_one({'id': id })
-    return render_template('result.html', content=thing['content'])
+    return render_template('result.html', html=thing['content'][0], script=thing['content'][1])
 
 
 
