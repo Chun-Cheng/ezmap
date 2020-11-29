@@ -10,7 +10,7 @@
         <h1>拓樸地圖生成器</h1>
         <main>
             <!-- 資料輸入在這邊 -->
-            <form method=POST enctype=multipart/form-data action="{{ url_for('uploads') }}">
+            <form method=POST enctype=multipart/form-data>  <!-- action="/uploads"-->
             <!-- ... -->
                 <input type=file name=json>
                 <input type="submit" value="送出">
