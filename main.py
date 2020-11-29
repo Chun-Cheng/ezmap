@@ -52,7 +52,7 @@ def upload_file():
             the_date = int(datetime.today().strftime('%Y%m%d'))
             the_time = int(datetime.now().strftime('%H%M%S'))
             save_data = { 'content' : result , 'date' : the_date , 'time' : the_time }  # os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            data_id = datas.insert_one(save_data)
+            data_id = datas.insert_one(save_data).inserted_id
             return redirect(f'/result/{data_id}')
         #redirect(url_for('uploads', filename=filename))
     return render_template('index.html')
@@ -61,7 +61,7 @@ def upload_file():
 @app.route('/result/<id>')
 def complete_file(id):
     global datas
-    thing = datas.find_one({'_id':id})  # datas.find_one({'_id': ObjectId(id) })
+    thing = datas.find_one({'_id': ObjectId(id) })
     return thing
 
 
