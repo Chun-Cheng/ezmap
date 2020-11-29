@@ -45,7 +45,7 @@ def upload_file():
             filename = secure_filename(file.filename)
             result = map_creator.generate_map( None )
             the_time = int(datetime.today().strftime('%Y%m%d%H%M%S%f'))
-            save_data = { content : os.path.join(app.config['UPLOAD_FOLDER'], filename) , time : the_time }
+            save_data = { 'content' : os.path.join(app.config['UPLOAD_FOLDER'], filename) , 'time' : the_time }
             data_id = datas.insert_one(save_data)
             return 'OK!'
             return redirect('/uploads/'+filename)
