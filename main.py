@@ -11,7 +11,7 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'json'}
 
 
 client = pymongo.MongoClient("mongodb+srv://dbUser:K3aCVDqGjoP9v5U8@themap.74csp.mongodb.net/mapdata?retryWrites=true&w=majority")
-data = client.mapdata.datas
+datas = client.mapdata.datas
 
 
 app = Flask(__name__)
@@ -46,6 +46,7 @@ def upload_file():
             result = map_creator.generate_map( None )
             the_time = int(datetime.today().strftime('%Y%m%d%H%M%S%f'))
             save_data = { content : os.path.join(app.config['UPLOAD_FOLDER'], filename) , time : the_time }
+            data_id = datas.insert_one(save_data)
             return 'OK!'
             return redirect('/uploads/'+filename)
         #redirect(url_for('uploads', filename=filename))
