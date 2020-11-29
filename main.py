@@ -34,7 +34,8 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploads',
+            return redirect('/uploads/'+filename)
+        #redirect(url_for('uploads',
                                     filename=filename))
     return render_template('index.html')
 
