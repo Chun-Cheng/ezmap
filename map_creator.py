@@ -259,10 +259,12 @@ def generate_map(data):
     </html>
     """
     
-    HTML_document = f"""
+    document_HTML = f"""
     <canvas id="canva" width="800" height="800" onload="draw();">
     </canvas>
+    """
     
+    document_script = f"""
     <script>
         function draw() \u007B
             var canvas = document.getElementById('canva');
@@ -273,7 +275,8 @@ def generate_map(data):
         \u007D
     </script>
     """
-    return HTML_document
+    
+    return document_HTML, document_script
 
 
 
