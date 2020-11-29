@@ -33,19 +33,20 @@ def upload_file():
         
         # check if the post request has the file part
         if 'file' not in request.files:
-            flash('No file part')
+            flash('找不到檔案資料')
             return redirect(request.url)
         file = request.files['file']
         # if user does not select file, browser also
         # submit an empty part without filename
         if file.filename == '':
-            flash('No selected file')
+            flash('未選擇任何檔案')
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             result = map_creator.generate_map( None )
             the_time = int(datetime.today().strftime('%Y%m%d%H%M%S%f'))
-            #save_data = { content : os.path.join(app.config['UPLOAD_FOLDER'], filename) , time : the_time }
+            save_data = { content : os.path.join(app.config['UPLOAD_FOLDER'], filename) , time : the_time }
+            return 'OK!'
             return redirect('/uploads/'+filename)
         #redirect(url_for('uploads', filename=filename))
     return render_template('index.html')
