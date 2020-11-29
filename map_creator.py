@@ -1,1 +1,3 @@
-
+def generate_map(data):
+    # ...
+    return 'hi~'
