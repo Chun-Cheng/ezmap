@@ -262,8 +262,18 @@ def generate_map(data):
     document_HTML = f"""
     <canvas id="canva" width="800" height="800" onload="draw();">
     </canvas>
-    """
     
+    <script>
+        function draw() \u007B
+            var canvas = document.getElementById('canva');
+            if (canvas.getContext) \u007B
+                var ctx = canvas.getContext('2d');
+                {draw}
+            \u007D
+        \u007D
+    </script>
+    """
+    '''
     document_script = f"""
     <script>
         function draw() \u007B
@@ -275,8 +285,8 @@ def generate_map(data):
         \u007D
     </script>
     """
-    
-    return document_HTML, document_script
+    '''
+    return document_HTML
 
 
 
