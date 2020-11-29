@@ -59,7 +59,8 @@ def upload_file():
 
 @app.route('/result/<id>')
 def complete_file(id):
-    thing = datas.find_one({'_id': ObjectId(id) })
+    global datas
+    thing = datas.find_one({'_id':id})  # datas.find_one({'_id': ObjectId(id) })
     return thing
 
 
