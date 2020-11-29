@@ -7,7 +7,7 @@ import dns # required for connecting with SRVt
 import map_creator
 
 
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'json'}
+ALLOWED_EXTENSIONS = {'json'}
 
 
 client = pymongo.MongoClient("mongodb+srv://dbUser:K3aCVDqGjoP9v5U8@themap.74csp.mongodb.net/mapdata?retryWrites=true&w=majority")
@@ -47,7 +47,7 @@ def upload_file():
         if file and allowed_file(file.filename):
             #filename = secure_filename(file.filename)
             content = file.read().decode('utf-8')
-            result = list(map_creator.generate_map(content))
+            result = map_creator.generate_map(content)
             the_date = int(datetime.today().strftime('%Y%m%d'))
             the_time = int(datetime.now().strftime('%H%M%S'))
             data_id = str(datetime.now().strftime('%Y%m%d%H%M%S%f'))
@@ -62,7 +62,7 @@ def upload_file():
 def complete_file(id):
     global datas
     thing = datas.find_one({'id': id })
-    return render_template('result.html', html=thing['content'][0], script=thing['content'][1])
+    return render_template('result.html', html=thing['content'])
 
 
 
