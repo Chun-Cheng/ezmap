@@ -226,8 +226,8 @@ def generate_map(data):
                         ctx.stroke();
                         """
 
-
-    HTML_document = f"""
+    
+    """
     <!DOCTYPE html>
     <html>
 
@@ -257,6 +257,21 @@ def generate_map(data):
     </body>
 
     </html>
+    """
+    
+    HTML_document = f"""
+    <canvas id="canva" width="800" height="800" onload="draw();">
+    </canvas>
+    
+    <script>
+        function draw() \u007B
+            var canvas = document.getElementById('canva');
+            if (canvas.getContext) \u007B
+                var ctx = canvas.getContext('2d');
+                {draw}
+            \u007D
+        \u007D
+    </script>
     """
     return HTML_document
 
