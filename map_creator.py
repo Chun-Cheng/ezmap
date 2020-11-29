@@ -27,7 +27,7 @@ def four_pos(ref_p, comp_p):
 def generate_map(data):
     
     # 輸/讀入資料
-    dot_data = json.loads(data.read())
+    dot_data = json.loads(data)
 
     # 製作地圖格式檔案
     # dot_data = [[line_id, color, [[station_id, name, [[type, trans_sta], ... ], x, y]]]]
