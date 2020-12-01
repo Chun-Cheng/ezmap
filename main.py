@@ -39,10 +39,6 @@ def upload_file():
     global datas
     # 刪除過期資料
     delete_hour_ago()
-    """
-    datas.delete_many( { 'date' : { '$lt' : int(datetime.today().strftime('%Y%m%d'))-1 } } )
-    datas.delete_many( { 'time' : { '$lt' : int(datetime.now().strftime('%H%M%S'))-10000 } } )
-    """
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -71,6 +67,8 @@ def upload_file():
 @app.route('/result/<id>')
 def complete_file(id):
     global datas
+    # 刪除過期資料
+    delete_hour_ago()
     thing = datas.find_one({'id': id })
     #return thing['content']
     return render_template('result.html', content=thing['content'] )
