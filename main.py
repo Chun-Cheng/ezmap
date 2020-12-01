@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, flash, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, timedelta
 import pymongo
 import dns # required for connecting with SRVt
 import map_creator
@@ -27,12 +27,22 @@ def index():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def delete_hour_ago():
+    hour_ago = (datetime.now()-timedelta(hours=1))..strftime('%Y%m%d %H%M%S')
+    condition = list(hour_ago.split())
+    datas.delete_many( { 'date' : { '$lt' : int(condition[0]) } } )
+    datas.delete_many( { 'time' : { '$lt' : int(condition[1]) } } )
+    
+
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     global datas
     # 刪除過期資料
+    delete_hour_ago()
+    """
     datas.delete_many( { 'date' : { '$lt' : int(datetime.today().strftime('%Y%m%d'))-1 } } )
     datas.delete_many( { 'time' : { '$lt' : int(datetime.now().strftime('%H%M%S'))-10000 } } )
+    """
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
