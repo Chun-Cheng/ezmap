@@ -46,7 +46,7 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             #filename = secure_filename(file.filename)
-            content = file.read()  #.decode('utf-8')
+            content = file.read().encode('utf-8')  #.decode('utf-8')
             result = map_creator.generate_map(content)
             the_date = int(datetime.today().strftime('%Y%m%d'))
             the_time = int(datetime.now().strftime('%H%M%S'))
