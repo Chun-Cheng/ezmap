@@ -28,7 +28,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def delete_hour_ago():
-    hour_ago = (datetime.now()-timedelta(hours=1))..strftime('%Y%m%d %H%M%S')
+    hour_ago = (datetime.now()-timedelta(hours=1)).strftime('%Y%m%d %H%M%S')
     condition = list(hour_ago.split())
     datas.delete_many( { 'date' : { '$lt' : int(condition[0]) } } )
     datas.delete_many( { 'time' : { '$lt' : int(condition[1]) } } )
