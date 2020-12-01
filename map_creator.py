@@ -259,7 +259,7 @@ def generate_map(data):
     """
     
     document_HTML = f"""
-        <canvas id="canva" width="800" height="800" onload="draw();">
+        <canvas id="canva" width="800" height="800">
         </canvas>
 
         <script>
@@ -272,6 +272,8 @@ def generate_map(data):
                     {draw}
                 \u007D
             \u007D
+            
+            draw();
         </script>
     """
     
