@@ -4,6 +4,7 @@ import math
 
 
 # 處理座標成四方位
+"""
 def four_pos(ref_p, comp_p):
     '''
     回傳比較點相對於基準點較接近的四方位
@@ -21,6 +22,28 @@ def four_pos(ref_p, comp_p):
     elif y >= (-math.sqrt(2) + 1) * x and y <= (math.sqrt(2) - 1) * x:
         return 'E'
     elif y >= (math.sqrt(2) - 1) * x and y <= (-math.sqrt(2) + 1) * x:
+        return 'W'
+"""
+def four_pos(ref_p, comp_p):
+    '''
+    回傳比較點相對於基準點較接近的四方位(10度)
+    輸入:
+    ref_p:基準點,(x,y)
+    comp_p:比較點,(x,y)
+    輸出:
+    pos:方位，N/S/E/W
+    '''
+    #度數->斜率
+    #10->0.1763269807085
+    #80->5.6712818196177
+    x, y = comp_p[0] - ref_p[0], comp_p[1] - ref_p[1]  # xy座標標準化(使ref_p成為原點)
+    if y >= -5.6712818196177 * x and y >= 5.6712818196177 * x:
+        return 'N'
+    elif y <= -5.6712818196177 * x and y <= 5.6712818196177 * x:
+        return 'S'
+    elif y >= -0.1763269807085 * x and y <= 0.1763269807085 * x:
+        return 'E'
+    elif y >= 0.1763269807085 * x and y <= -0.1763269807085 * x:
         return 'W'
 
 
@@ -44,11 +67,13 @@ def generate_map(data):
             dot_data[i][2][j][3] = None  # 清掉x
             dot_data[i][2][j][4] = None  # 清掉y
 
-    # 找出轉乘站
+    # 找出轉乘站和端點站
     transfer_dict = {}
     for i in range(len(dot_data)):
         for j in range(len(dot_data[i][2])):
             if len(dot_data[i][2][j][2]) != 0:
+                transfer_dict[dot_data[i][2][j][0]] = [i, j]
+            if j==0 or j==len(dot_data[i][2])-1:
                 transfer_dict[dot_data[i][2][j][0]] = [i, j]
     transfer_list = list(transfer_dict.keys())
 
@@ -135,20 +160,20 @@ def generate_map(data):
     for i in line_data:
         color = i[1]
         draw += f"""ctx.beginPath();
-                        ctx.arc({i[2][0]*n}, {800-(i[2][1]*n)}, 2.5, 0, 2 * Math.PI);
+                        ctx.arc({i[2][0]*n}, {1200-(i[2][1]*n)}, 2.5, 0, 2 * Math.PI);
                         ctx.lineWidth = 5;
                         ctx.strokeStyle = '{color}';
                         ctx.stroke();
 
                         ctx.beginPath();
-                        ctx.moveTo({i[2][0]*n}, {800-(i[2][1]*n)});
-                        ctx.lineTo({i[2][2]*n}, {800-(i[2][3]*n)});
+                        ctx.moveTo({i[2][0]*n}, {1200-(i[2][1]*n)});
+                        ctx.lineTo({i[2][2]*n}, {1200-(i[2][3]*n)});
                         ctx.lineWidth = 10;
                         ctx.strokeStyle = '{color}';
                         ctx.stroke();
 
                         ctx.beginPath();
-                        ctx.arc({i[2][2]*n}, {800-(i[2][3]*n)}, 2.5, 0, 2 * Math.PI);
+                        ctx.arc({i[2][2]*n}, {1200-(i[2][3]*n)}, 2.5, 0, 2 * Math.PI);
                         ctx.lineWidth = 5;
                         ctx.strokeStyle = '{color}';
                         ctx.stroke();
@@ -200,7 +225,7 @@ def generate_map(data):
 
                 draw += f"""
                         ctx.beginPath();
-                        ctx.arc({j[3]*n+10}, {800-(j[4]*n+10)}, 5,  (2 * Math.PI)/{all_part}*{part_so_far}+(0.5 * Math.PI), (2 * Math.PI)/{all_part}*{part_so_far + 1}+(0.5 * Math.PI) , true);
+                        ctx.arc({j[3]*n+10}, {1200-(j[4]*n+10)}, 5,  (2 * Math.PI)/{all_part}*{part_so_far}+(0.5 * Math.PI), (2 * Math.PI)/{all_part}*{part_so_far + 1}+(0.5 * Math.PI) , true);
                         ctx.lineWidth = 10;
                         ctx.strokeStyle = '{color}';
                         ctx.stroke();
@@ -211,8 +236,8 @@ def generate_map(data):
                 '''
                 draw += f"""
                         ctx.beginPath();
-                        ctx.moveTo({j[3]*n}, {800-(j[4]*n)});
-                        ctx.lineTo({j[3]*n}, {800-(j[4]*n+7)});
+                        ctx.moveTo({j[3]*n}, {1200-(j[4]*n)});
+                        ctx.lineTo({j[3]*n}, {1200-(j[4]*n+7)});
                         ctx.lineWidth = 7;
                         ctx.strokeStyle = '{color}';
                         ctx.stroke();
@@ -220,7 +245,7 @@ def generate_map(data):
                 '''
                 draw += f"""
                         ctx.beginPath();
-                        ctx.arc({j[3]*n+10}, {800-(j[4]*n+10)}, 5, 0, 2 * Math.PI);
+                        ctx.arc({j[3]*n+10}, {1200-(j[4]*n+10)}, 5, 0, 2 * Math.PI);
                         ctx.lineWidth = 10;
                         ctx.strokeStyle = '{color}';
                         ctx.stroke();
@@ -239,7 +264,7 @@ def generate_map(data):
 
     <body onload="draw();">
 
-        <canvas id="canva" width="800" height="800">
+        <canvas id="canva" width="1200" height="1200">
         </canvas>
 
         <script>
@@ -259,7 +284,7 @@ def generate_map(data):
     """
     
     document_HTML = f"""
-        <canvas id="canva" width="800" height="800">
+        <canvas id="canva" width="1200" height="1200">
         </canvas>
 
         <script>
