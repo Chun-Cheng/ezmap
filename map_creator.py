@@ -45,6 +45,33 @@ def four_pos(ref_p, comp_p):
         return 'E'
     elif y >= 0.1763269807085 * x and y <= -0.1763269807085 * x:
         return 'W'
+    
+#方位判斷
+def judge_pos(ref_p, comp_p):
+    """
+    回傳比較點相對於基準點所在的方位
+    輸入:
+    ref_p:基準點,(x,y)
+    comp_p:比較點,(x,y)
+    輸出:
+    pos:方位，NE/NW/SE/SW N/S/E/W None
+    """
+    if ref_p[1] > comp_p[1]:
+        ret = 'S'
+    elif ref_p[1] < comp_p[1]:
+        ret = 'N'
+    elif ref_p[1] == comp_p[1]:
+        ret = ''
+
+    if ref_p[0] > comp_p[0]:
+        ret += 'W'
+    elif ref_p[0] < comp_p[0]:
+        ret += 'E'
+    
+    if ret=='':
+        ret = None
+
+    return ret
 
 
 def generate_map(data):
@@ -143,6 +170,123 @@ def generate_map(data):
 
 
     # 處理普通站及路線
+    # dot_data = [[line_id, color, [[station_id, name, [[type, trans_sta], ... ], x, y]]]]
+    for i in range(len(dot_data)):
+        style = ''
+        section = []  # (車站代碼, j)
+        for j in range(len(dot_data[i][2])):
+
+            if j==0:  # 第1站
+                section.append((dot_data[i][2][j][0], j))
+
+            elif j==len(dot_data[i][2])-1:  # 最後1站
+                if style=='':
+                    style = 'single' #單段
+                section.append((dot_data[i][2][j][0], j))
+
+            elif len(dot_data[i][2][j][2])!=0:  # 如果(非首尾兩站)且是轉乘站
+                if style=='':
+                    style = 'multi'  # 多段
+                section.append((dot_data[i][2][j][0], j))
+
+
+        line_index = 0
+        # line_data = [[line_id, color, [x1, y1, x2, y2], ...]...]
+        for j in range(len(section)-1):
+            if style=='single':
+                if len(dot_data[i][2][section[j][1]][2])!=0 and len(dot_data[i][2][section[j+1][1]][2])!=0:  # 首尾站為轉乘站
+                    pass
+                    # 找出中點
+                    middle_dot = ( (dot_data[i][2][section[j+1][1]][3]+dot_data[i][2][section[j][1]][3])/2 , (dot_data[i][2][section[j+1][1]][4]+dot_data[i][2][section[j][1]][4])/2 )
+                    # 向兩端延伸
+                    # 向前判斷 右上 右下 左上 左下
+                    pos = judge_pos( middle_dot , (dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4]) )
+                    if pos == None:
+                        print('DATA ERROR!')
+
+                    elif pos == 'N' or pos == 'S' or pos == 'E' or pos == 'W':
+                        line_index += 1
+                        line_id = dot_data[i][0] + str(line_index)
+                        line_color = dot_data[i][1]
+                        coord_1 = ( dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4] )
+                        coord_2 = ( dot_data[i][2][section[j+1][1]][3], dot_data[i][2][section[j+1][1]][4] )
+                        line_data.append( [line_id, line_color, [coord_1[0], coord_1[1], coord_2[0], coord_2[1]] ] )
+
+                    else:
+                        delta_x = (dot_data[i][2][section[j][1]][3] - middle_dot[0])
+                        delta_y = (dot_data[i][2][section[j][1]][4] - middle_dot[1])
+
+                        # 延伸
+                        if math.abs(delta_x) < math.abs(delta_y):
+
+                            if pos[0] == 'N':
+                                front_pos = (dot_data[i][2][section[j][1]][3], middle_dot[1] + delta_x)
+                                back_pos = (dot_data[i][2][section[j+1][1]][3], middle_dot[1] - delta_x)
+
+                            elif pos[0] == 'S':
+                                front_pos = (dot_data[i][2][section[j][1]][3], middle_dot[1] - delta_x)
+                                back_pos = (dot_data[i][2][section[j+1][1]][3], middle_dot[1] + delta_x)
+
+
+                        elif math.abs(delta_x) > math.abs(delta_y):
+                            if pos[0] == 'E':
+                                front_pos = ( middle_dot + delta_y , dot_data[i][2][section[j][1]][4])
+                                back_pos = ( middle_dot - delta_y , dot_data[i][2][section[j+1][1]][4])
+
+                            elif pos[0] == 'W':
+                                front_pos = ( middle_dot - delta_y , dot_data[i][2][section[j][1]][4])
+                                back_pos = ( middle_dot + delta_y , dot_data[i][2][section[j+1][1]][4])
+
+                        line_index += 1
+                        line_id = dot_data[i][0] + str(line_index)
+                        line_color = dot_data[i][1]
+                        coord_1 = ( dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4] )
+                        coord_2 = ( dot_data[i][2][section[j+1][1]][3], dot_data[i][2][section[j+1][1]][4] )
+                        line_data.append( [line_id, line_color, [coord_1[0], coord_1[1], front_pos[0], front_pos[1]]] )
+
+                        line_index += 1
+                        line_id = dot_data[i][0] + str(line_index)
+                        line_data.append( [line_id, line_color, [front_pos[0], front_pos[1], back_pos[0], back_pos[1]]] )
+
+                        line_index += 1
+                        line_id = dot_data[i][0] + str(line_index)
+                        line_data.append( [line_id, line_color, [back_pos[0], back_pos[1], coord_2[0], coord_2[1]]] )
+
+
+
+
+                    # 向後延伸
+                    # 判斷 右上 右下 左上 左下
+
+                    # 4點都找出來了
+                    # 加入line_data
+
+                elif len(dot_data[i][2][section[j][1]][2])!=0:  # 首站為轉乘
+                    pass
+                    # 從尾站向前端延伸
+                    # 4點都找出來了
+                    # 加入line_data
+
+                elif len(dot_data[i][2][section[j+1][1]][2])!=0:  # 尾站為轉乘
+                    pass
+                    # 從首站向後端延伸
+                    # 4點都找出來了
+                    # 加入line_data
+
+                else:  # 首尾皆非轉乘
+                    pass
+                    # 找出中點
+                    # 向兩端延伸
+                    # 4點都找出來了
+                    # 加入line_data
+
+            elif style=='multi':
+                if j==0:  # 是首站
+                    pass
+
+                else:  # 非首站
+                    pass
+
 
 
 
@@ -160,20 +304,22 @@ def generate_map(data):
     for i in line_data:
         color = i[1]
         draw += f"""ctx.beginPath();
+                    ctx.arc({i[2][0]*n}, {1200-(i[2][1]*n)}, 2.5, 0, 2 * Math.PI);
+                    ctx.lineWidth = 5;
+                    ctx.strokeStyle = '{color}';
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo({i[2][0]*n}, {1200-(i[2][1]*n)});
+                    ctx.lineTo({i[2][2]*n}, {1200-(i[2][3]*n)});
+                    ctx.lineWidth = 10;
+                    ctx.strokeStyle = '{color}';
+                    ctx.stroke();
+                    """
+
+        if i == line_data[len(line_data)-1]:
+            draw += f"""ctx.beginPath();
                         ctx.arc({i[2][0]*n}, {1200-(i[2][1]*n)}, 2.5, 0, 2 * Math.PI);
-                        ctx.lineWidth = 5;
-                        ctx.strokeStyle = '{color}';
-                        ctx.stroke();
-
-                        ctx.beginPath();
-                        ctx.moveTo({i[2][0]*n}, {1200-(i[2][1]*n)});
-                        ctx.lineTo({i[2][2]*n}, {1200-(i[2][3]*n)});
-                        ctx.lineWidth = 10;
-                        ctx.strokeStyle = '{color}';
-                        ctx.stroke();
-
-                        ctx.beginPath();
-                        ctx.arc({i[2][2]*n}, {1200-(i[2][3]*n)}, 2.5, 0, 2 * Math.PI);
                         ctx.lineWidth = 5;
                         ctx.strokeStyle = '{color}';
                         ctx.stroke();
