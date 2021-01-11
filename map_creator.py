@@ -194,13 +194,16 @@ def generate_map(data):
         # line_data = [[line_id, color, [x1, y1, x2, y2], ...]...]
         for j in range(len(section)-1):
             if style=='single':
-                if len(dot_data[i][2][section[j][1]][2])!=0 and len(dot_data[i][2][section[j+1][1]][2])!=0:  # 首尾站為轉乘站
-                    pass
+                if ( len(dot_data[i][2][section[j][1]][2])!=0 and len(dot_data[i][2][section[j+1][1]][2])!=0 ) \
+                or ( len(dot_data[i][2][section[j][1]][2])==0 and len(dot_data[i][2][section[j+1][1]][2])==0 ):  #首尾站皆為轉乘站或皆為非轉乘站
                     # 找出中點
                     middle_dot = ( (dot_data[i][2][section[j+1][1]][3]+dot_data[i][2][section[j][1]][3])/2 , (dot_data[i][2][section[j+1][1]][4]+dot_data[i][2][section[j][1]][4])/2 )
                     # 向兩端延伸
                     # 向前判斷 右上 右下 左上 左下
                     pos = judge_pos( middle_dot , (dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4]) )
+                    coord_1 = ( dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4] )
+                    coord_2 = ( dot_data[i][2][section[j+1][1]][3], dot_data[i][2][section[j+1][1]][4] )
+
                     if pos == None:
                         print('DATA ERROR!')
 
@@ -208,75 +211,129 @@ def generate_map(data):
                         line_index += 1
                         line_id = dot_data[i][0] + str(line_index)
                         line_color = dot_data[i][1]
-                        coord_1 = ( dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4] )
-                        coord_2 = ( dot_data[i][2][section[j+1][1]][3], dot_data[i][2][section[j+1][1]][4] )
                         line_data.append( [line_id, line_color, [coord_1[0], coord_1[1], coord_2[0], coord_2[1]] ] )
 
                     else:
-                        delta_x = (dot_data[i][2][section[j][1]][3] - middle_dot[0])
-                        delta_y = (dot_data[i][2][section[j][1]][4] - middle_dot[1])
+                        delta_x = abs(dot_data[i][2][section[j][1]][3] - middle_dot[0])
+                        delta_y = abs(dot_data[i][2][section[j][1]][4] - middle_dot[1])
 
-                        # 延伸
-                        if math.abs(delta_x) < math.abs(delta_y):
+                        # 延伸(找出4點)
+                        if delta_x == delta_y:
+                            line_index += 1
+                            line_id = dot_data[i][0] + str(line_index)
+                            line_color = dot_data[i][1]
+                            coord_1 = ( dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4] )
+                            coord_2 = ( dot_data[i][2][section[j+1][1]][3], dot_data[i][2][section[j+1][1]][4] )
+                            line_data.append( [line_id, line_color, [coord_1[0], coord_1[1], coord_2[0], coord_2[1]]] )
+                        else:
+
+                            if delta_x < delta_y:
+
+                                if pos[0] == 'N':
+                                    front_pos = (dot_data[i][2][section[j][1]][3], middle_dot[1] + delta_x)
+                                    back_pos = (dot_data[i][2][section[j+1][1]][3], middle_dot[1] - delta_x)
+
+                                elif pos[0] == 'S':
+                                    front_pos = (dot_data[i][2][section[j][1]][3], middle_dot[1] - delta_x)
+                                    back_pos = (dot_data[i][2][section[j+1][1]][3], middle_dot[1] + delta_x)
+
+
+                            elif delta_x > delta_y:
+                                if pos[1] == 'E':
+                                    front_pos = ( middle_dot + delta_y , dot_data[i][2][section[j][1]][4])
+                                    back_pos = ( middle_dot - delta_y , dot_data[i][2][section[j+1][1]][4])
+
+                                elif pos[1] == 'W':
+                                    front_pos = ( middle_dot - delta_y , dot_data[i][2][section[j][1]][4])
+                                    back_pos = ( middle_dot + delta_y , dot_data[i][2][section[j+1][1]][4])
+
+
+                            # 加入line_data
+                            line_index += 1
+                            line_id = dot_data[i][0] + str(line_index)
+                            line_color = dot_data[i][1]
+                            coord_1 = ( dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4] )
+                            coord_2 = ( dot_data[i][2][section[j+1][1]][3], dot_data[i][2][section[j+1][1]][4] )
+                            line_data.append( [line_id, line_color, [coord_1[0], coord_1[1], front_pos[0], front_pos[1]]] )
+
+                            line_index += 1
+                            line_id = dot_data[i][0] + str(line_index)
+                            line_data.append( [line_id, line_color, [front_pos[0], front_pos[1], back_pos[0], back_pos[1]]] )
+
+                            line_index += 1
+                            line_id = dot_data[i][0] + str(line_index)
+                            line_data.append( [line_id, line_color, [back_pos[0], back_pos[1], coord_2[0], coord_2[1]]] )
+
+
+
+                elif len(dot_data[i][2][section[j][1]][2])!=0 or len(dot_data[i][2][section[j+1][1]][2])!=0:  # 首/尾站為轉乘
+                    coord_1 = ( dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4] )
+                    coord_2 = ( dot_data[i][2][section[j+1][1]][3], dot_data[i][2][section[j+1][1]][4] )
+
+                    a = j
+                    b = a + 1
+                    if len(dot_data[i][2][section[j+1][1]][2])==0:
+                        a, b = b, a
+
+                    trans_dot = ( dot_data[i][2][section[a][1]][3] , dot_data[i][2][section[a][1]][4] )
+                    pos = judge_pos( trans_dot , (dot_data[i][2][section[b][1]][3], dot_data[i][2][section[b][1]][4]) )
+
+                    # 向另一端延伸
+                    # 向前判斷 右上 右下 左上 左下
+
+                    if pos == None:
+                        print('DATA ERROR!')
+
+                    elif pos == 'N' or pos == 'S' or pos == 'E' or pos == 'W':
+                        line_index += 1
+                        line_id = dot_data[i][0] + str(line_index)
+                        line_color = dot_data[i][1]
+                        line_data.append( [line_id, line_color, [coord_1[0], coord_1[1], coord_2[0], coord_2[1]] ] )
+
+                    else:
+                        # 延伸(找出轉折點)
+
+                        delta_x = abs((trans_dot[0] - dot_data[i][2][section[j][1]][3]))
+                        delta_y = abs((trans_dot[1] - dot_data[i][2][section[j][1]][4]))
+                        """
+                        if abs(delta_x) == abs(delta_y):
+                            line_index += 1
+                            line_id = dot_data[i][0] + str(line_index)
+                            line_color = dot_data[i][1]
+                            coord_1 = ( dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4] )
+                            coord_2 = ( dot_data[i][2][section[j+1][1]][3], dot_data[i][2][section[j+1][1]][4] )
+                            line_data.append( [line_id, line_color, [coord_1[0], coord_1[1], coord_2[0], coord_2[1]]] )
+
+                        else:
+                        """
+                        if abs(delta_x) <= abs(delta_y):
 
                             if pos[0] == 'N':
-                                front_pos = (dot_data[i][2][section[j][1]][3], middle_dot[1] + delta_x)
-                                back_pos = (dot_data[i][2][section[j+1][1]][3], middle_dot[1] - delta_x)
+                                turn_pos = (dot_data[i][2][section[b][1]][3], dot_data[i][2][section[a][1]][4] + delta_x )
 
                             elif pos[0] == 'S':
-                                front_pos = (dot_data[i][2][section[j][1]][3], middle_dot[1] - delta_x)
-                                back_pos = (dot_data[i][2][section[j+1][1]][3], middle_dot[1] + delta_x)
+                                turn_pos = (dot_data[i][2][section[b][1]][3], dot_data[i][2][section[a][1]][4] - delta_x )
 
 
-                        elif math.abs(delta_x) > math.abs(delta_y):
-                            if pos[0] == 'E':
-                                front_pos = ( middle_dot + delta_y , dot_data[i][2][section[j][1]][4])
-                                back_pos = ( middle_dot - delta_y , dot_data[i][2][section[j+1][1]][4])
+                        elif abs(delta_x) > abs(delta_y):
+                            if pos[1] == 'E':
+                                turn_pos = (dot_data[i][2][section[a][1]][3] + delta_y , dot_data[i][2][section[b][1]][4])
 
-                            elif pos[0] == 'W':
-                                front_pos = ( middle_dot - delta_y , dot_data[i][2][section[j][1]][4])
-                                back_pos = ( middle_dot + delta_y , dot_data[i][2][section[j+1][1]][4])
+                            elif pos[1] == 'W':
+                                turn_pos = (dot_data[i][2][section[a][1]][3] - delta_y , dot_data[i][2][section[b][1]][4])
 
                         line_index += 1
                         line_id = dot_data[i][0] + str(line_index)
                         line_color = dot_data[i][1]
                         coord_1 = ( dot_data[i][2][section[j][1]][3], dot_data[i][2][section[j][1]][4] )
                         coord_2 = ( dot_data[i][2][section[j+1][1]][3], dot_data[i][2][section[j+1][1]][4] )
-                        line_data.append( [line_id, line_color, [coord_1[0], coord_1[1], front_pos[0], front_pos[1]]] )
-
+                        line_data.append( [line_id, line_color, [coord_1[0], coord_1[1], turn_pos[0], turn_pos[1]]] )
                         line_index += 1
                         line_id = dot_data[i][0] + str(line_index)
-                        line_data.append( [line_id, line_color, [front_pos[0], front_pos[1], back_pos[0], back_pos[1]]] )
-
-                        line_index += 1
-                        line_id = dot_data[i][0] + str(line_index)
-                        line_data.append( [line_id, line_color, [back_pos[0], back_pos[1], coord_2[0], coord_2[1]]] )
+                        line_data.append( [line_id, line_color, [turn_pos[0], turn_pos[1], coord_2[0], coord_2[1]]] )
 
 
-
-
-                    # 向後延伸
-                    # 判斷 右上 右下 左上 左下
-
-                    # 4點都找出來了
-                    # 加入line_data
-
-                elif len(dot_data[i][2][section[j][1]][2])!=0:  # 首站為轉乘
-                    pass
                     # 從尾站向前端延伸
-                    # 4點都找出來了
-                    # 加入line_data
-
-                elif len(dot_data[i][2][section[j+1][1]][2])!=0:  # 尾站為轉乘
-                    pass
-                    # 從首站向後端延伸
-                    # 4點都找出來了
-                    # 加入line_data
-
-                else:  # 首尾皆非轉乘
-                    pass
-                    # 找出中點
-                    # 向兩端延伸
                     # 4點都找出來了
                     # 加入line_data
 
